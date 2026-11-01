@@ -48,7 +48,7 @@ That is expected behaviour of the platform, not a PeerPlay bug.
 PeerPlay is therefore also published through a public Cloudflare tunnel, which needs no token:
 
 ```
-https://hash-independence-must-asp.trycloudflare.com
+https://resources-province-hist-available.trycloudflare.com
 ```
 
 * Open that URL in **any** browser, on any machine.
@@ -58,19 +58,30 @@ https://hash-independence-must-asp.trycloudflare.com
   seeded players, e.g. `wanjiruachieng` / `Player123!` and `brianodhiambo` / `Player123!`, then
   queue the same stake on both.
 
-The URL lives in **`PUBLIC_URL.txt`** (repo root and workspace root). Quick tunnels are anonymous:
-Cloudflare deletes abandoned ones and the hostname changes whenever the tunnel restarts, so the
-**supervisor** keeps it alive and republishes the current address:
+The URL lives in **`PUBLIC_URL.txt`** (repo root and workspace root) and every address the
+supervisor has served is appended to **`PUBLIC_URLS.txt`**. Quick tunnels are anonymous: Cloudflare
+garbage-collects abandoned ones (the old link then answers `530`) and the hostname changes
+whenever the tunnel is recycled, so the **supervisor** keeps it alive and republishes the current
+address:
 
 ```bash
 npm run tunnel:watch     # self-healing: restarts the tunnel, health-checks the public URL
 cat PUBLIC_URL.txt       # the address that is live right now
+tail -5 PUBLIC_URLS.txt  # every address it has published (newest last)
 ```
 
 The supervisor runs cloudflared over HTTP/2 (QUIC is unreliable from this sandbox), restarts the
-tunnel if the process dies, and recycles it if the public URL stops answering three health checks
-in a row. A quick tunnel also makes the sandbox reachable by anyone who has the link, so treat it
-as a temporary demo address, not a production deployment. The Arena live-preview panel
+tunnel if the process dies, recycles it when cloudflared reports the tunnel is gone, and recycles
+it when the public URL stops answering two health checks in a row (20 s apart). A new hostname is
+verified twice before it is published, so the address in `PUBLIC_URL.txt` is always live.
+
+> **If a link stops working:** open `PUBLIC_URL.txt` (or the live-preview panel) to get the
+> current address — Cloudflare may have recycled the tunnel and issued a new hostname.
+
+A quick tunnel also makes the sandbox reachable by anyone who has the link, so treat it
+as a temporary demo address, not a production deployment. For a permanent address, create a
+named Cloudflare tunnel (`cloudflared tunnel create` + a `config.yml` with your own domain) or
+deploy the app on a host with a real hostname — see §15.4. The Arena live-preview panel
 (`*.e2b.app`) always works as a stable fallback inside the platform.
 
 ---

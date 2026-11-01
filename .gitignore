@@ -38,3 +38,6 @@ Thumbs.db
 .local/
 .tools/
 PUBLIC_URL.txt
+
+# public tunnel address history (runtime)
+PUBLIC_URLS.txt
