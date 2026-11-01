@@ -17,6 +17,8 @@
     "tunnel:watch": "bash scripts/tunnel-supervisor.sh",
     "smoke": "npm --prefix server run smoke",
     "tunnel:pinggy": "bash scripts/tunnel-pinggy.sh",
-    "tunnel:tunnelmole": "bash scripts/tunnel-tunnelmole.sh"
+    "tunnel:tunnelmole": "bash scripts/tunnel-tunnelmole.sh",
+    "keepalive": "bash scripts/keep-alive.sh",
+    "start:all": "bash scripts/start-all.sh"
   }
 }

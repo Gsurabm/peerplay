@@ -38,6 +38,10 @@ peerplay/
 
 ---
 
+> **Coming back later?** The workspace keeps everything, and `/home/user/CONTINUATION_BRIEF.md`
+> is the entry point: it lists the live-link check, the open decisions (permanent URL, GitHub
+> push, optional real M-Pesa) and the constraints that must not drift.
+
 ## 0. Public URL (open it in any browser, in two tabs or two browsers)
 
 The sandbox preview host (`https://4000-<sandbox>.e2b.app`) is a **private** E2B endpoint: every
