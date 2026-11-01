@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+web/dist/
+
+# runtime data (database + WAL, regenerate with `npm run seed`)
+server/data/
+*.db
+*.db-shm
+*.db-wal
+
+# user uploads
+server/uploads/
+
+# secrets - never commit these
+.env
+.env.local
+.env.*.local
+*.pem
+
+# logs
+*.log
+npm-debug.log*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# platform / tooling
+.arena/
+.cache/
+.local/
+.tools/
+PUBLIC_URL.txt
