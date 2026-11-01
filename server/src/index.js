@@ -26,6 +26,7 @@ import notificationRoutes from './routes/notifications.js';
 import reportRoutes from './routes/reports.js';
 import referralRoutes from './routes/referrals.js';
 import adminRoutes from './routes/admin.js';
+import { publicLinks } from './services/publicLinks.js';
 
 migrate();
 
@@ -61,6 +62,7 @@ app.get('/api/health', (_req, res) => {
 
 app.get('/api/config', (_req, res) => {
   res.json({
+    public_links: publicLinks(),
     platform_fee_bps: config.platformFeeBps,
     min_stake_cents: config.minStakeCents,
     stake_step_cents: config.stakeStepCents,

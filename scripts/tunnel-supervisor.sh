@@ -24,6 +24,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIN="$ROOT/.tools/cloudflared"
 LOG="$ROOT/.tools/tunnel.log"
 URL_FILE="$ROOT/PUBLIC_URL.txt"
+LIVE_FILE="$ROOT/.tools/url_cf.txt"
 HISTORY_FILE="$ROOT/PUBLIC_URLS.txt"
 MIRROR="/home/user/PUBLIC_URL.txt"
 PORT="${PORT:-4000}"
@@ -108,10 +109,12 @@ while true; do
       break
     fi
 
-    if curl -fs -m 20 -o /dev/null "$URL/api/health"; then
+    if curl -fs -m 20 "$URL/api/health" | grep -q '"ok":true'; then
       FAILURES=0
+      echo "$URL" > "$LIVE_FILE"
     else
       FAILURES=$((FAILURES + 1))
+      rm -f "$LIVE_FILE"
       log "health check failed ($FAILURES/$MAX_FAILURES) for $URL"
       if [ "$FAILURES" -ge "$MAX_FAILURES" ]; then
         log "tunnel unhealthy - recycling"
@@ -122,7 +125,7 @@ while true; do
 
   kill "$TUNNEL_PID" 2>/dev/null
   wait "$TUNNEL_PID" 2>/dev/null
-  rm -f "$URL_FILE"
+  rm -f "$URL_FILE" "$LIVE_FILE"
   log "tunnel stopped - restarting in 5s"
   sleep 5
 done

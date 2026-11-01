@@ -45,44 +45,51 @@ request must carry the sandbox's traffic access token, so a raw link returns the
 "Authentication required" documentation page in a browser that has never seen the preview.
 That is expected behaviour of the platform, not a PeerPlay bug.
 
-PeerPlay is therefore also published through a public Cloudflare tunnel, which needs no token:
+PeerPlay is therefore also published through **public tunnels**, which need no token. Three
+providers run in parallel, each with its own self-healing supervisor, so a single provider
+recycling never takes the app offline:
 
 ```
-https://resources-province-hist-available.trycloudflare.com
+https://5kpppi-ip-136-69-231-51.tunnelmole.net     ← primary (Tunnelmole, no interstitial)
 ```
 
-* Open that URL in **any** browser, on any machine.
+| Provider | Script | Notes |
+| --- | --- | --- |
+| **Tunnelmole** | `npm run tunnel:tunnelmole` | primary - free, no account, no "click to enter" page |
+| **Cloudflare** | `npm run tunnel:watch` | quick tunnel; Cloudflare reaps it within minutes from this sandbox, so it is a backup only |
+| **Pinggy** | `npm run tunnel:pinggy` | backup - free, but shows a one-click "Caution" interstitial on the HTML page |
+
+* Open the address in **any** browser, on any machine.
 * Two **tabs** in one browser → use the **✦ Two-player test** button (opens a second tab with its
   own funded account).
 * Two **different browsers** (or one normal + one private window) → log in as two different
   seeded players, e.g. `wanjiruachieng` / `Player123!` and `brianodhiambo` / `Player123!`, then
   queue the same stake on both.
 
-The URL lives in **`PUBLIC_URL.txt`** (repo root and workspace root) and every address the
-supervisor has served is appended to **`PUBLIC_URLS.txt`**. Quick tunnels are anonymous: Cloudflare
-garbage-collects abandoned ones (the old link then answers `530`) and the hostname changes
-whenever the tunnel is recycled, so the **supervisor** keeps it alive and republishes the current
-address:
+### Where the live address lives
+
+| Where | What |
+| --- | --- |
+| `PUBLIC_URL.txt` (repo root **and** workspace root) | the single address that is live right now |
+| `.tools/url_tm.txt`, `.tools/url_cf.txt`, `.tools/url_pg.txt` | per-provider address, written **only while it answers** |
+| `GET /api/config` → `public_links[]` | every currently healthy address, read live |
+| The landing page | an "Open this app on another device" card with a **Copy** button for each live address |
 
 ```bash
-npm run tunnel:watch     # self-healing: restarts the tunnel, health-checks the public URL
-cat PUBLIC_URL.txt       # the address that is live right now
-tail -5 PUBLIC_URLS.txt  # every address it has published (newest last)
+npm run tunnel:tunnelmole   # primary tunnel (self-healing)
+npm run tunnel:watch        # Cloudflare backup
+npm run tunnel:pinggy       # Pinggy backup
+cat PUBLIC_URL.txt          # the address that is live right now
 ```
 
-The supervisor runs cloudflared over HTTP/2 (QUIC is unreliable from this sandbox), restarts the
-tunnel if the process dies, recycles it when cloudflared reports the tunnel is gone, and recycles
-it when the public URL stops answering two health checks in a row (20 s apart). A new hostname is
-verified twice before it is published, so the address in `PUBLIC_URL.txt` is always live.
+Every supervisor health-checks its own address, recycles it when it stops answering, and only
+publishes an address that actually responds - so the link shown in the app is always a working
+one. If a link you saved stops responding, open the landing page (or `PUBLIC_URL.txt`) and copy
+the current address.
 
-> **If a link stops working:** open `PUBLIC_URL.txt` (or the live-preview panel) to get the
-> current address — Cloudflare may have recycled the tunnel and issued a new hostname.
-
-A quick tunnel also makes the sandbox reachable by anyone who has the link, so treat it
-as a temporary demo address, not a production deployment. For a permanent address, create a
-named Cloudflare tunnel (`cloudflared tunnel create` + a `config.yml` with your own domain) or
-deploy the app on a host with a real hostname — see §15.4. The Arena live-preview panel
-(`*.e2b.app`) always works as a stable fallback inside the platform.
+> **Want one permanent address?** A quick tunnel is temporary by design. The durable options are
+> a named Cloudflare tunnel on your own domain (`cloudflared tunnel create` + a token), or
+> deploying the app from GitHub to a host with a real hostname — see §15.4.
 
 ---
 

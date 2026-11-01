@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useApp } from '../state/AppContext.jsx';
-import { post } from '../lib/api.js';
+import { get, post } from '../lib/api.js';
 import { startTestDuel } from '../lib/duel.js';
 
 const FEATURES = [
@@ -48,8 +48,16 @@ export default function Landing() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [duelBusy, setDuelBusy] = useState(false);
+  const [publicLinks, setPublicLinks] = useState([]);
+  const [copied, setCopied] = useState('');
 
   if (user) return <Navigate to="/app" replace />;
+
+  useEffect(() => {
+    get('/config')
+      .then((c) => setPublicLinks(c?.public_links || []))
+      .catch(() => {});
+  }, []);
 
   async function quickStart() {
     setBusy(true);
@@ -66,6 +74,16 @@ export default function Landing() {
   }
 
   /** One click: this tab becomes player 1, a new tab becomes player 2. */
+  async function copyLink(url) {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(url);
+      setTimeout(() => setCopied(''), 2000);
+    } catch {
+      window.prompt('Copy this link', url);
+    }
+  }
+
   async function testDuel() {
     setDuelBusy(true);
     try {
@@ -128,6 +146,30 @@ export default function Landing() {
             <span>✦ Flat 25% platform fee</span>
             <span>✦ KSh 10 minimum stake</span>
           </div>
+          {publicLinks.length > 0 && (
+            <div className="card pad-sm" style={{ marginTop: 16, maxWidth: 520 }}>
+              <div className="card-title" style={{ marginBottom: 8 }}>
+                Open this app on another device
+              </div>
+              {publicLinks.map((l) => (
+                <div key={l.url} className="row" style={{ gap: 8, marginBottom: 6 }}>
+                  <span className="tiny dim" style={{ minWidth: 118 }}>
+                    {l.label}
+                  </span>
+                  <span className="mono tiny grow" style={{ wordBreak: 'break-all' }}>
+                    {l.url}
+                  </span>
+                  <button className="btn sm ghost" onClick={() => copyLink(l.url)}>
+                    {copied === l.url ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+              ))}
+              <div className="tiny dim" style={{ marginTop: 6 }}>
+                Tunnel addresses change when the sandbox recycles them - copy the link again if it stops
+                responding.
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="split-card">

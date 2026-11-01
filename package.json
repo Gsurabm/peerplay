@@ -15,6 +15,8 @@
     "tunnel": "bash scripts/tunnel.sh",
     "tunnel:bg": "bash scripts/tunnel.sh --bg",
     "tunnel:watch": "bash scripts/tunnel-supervisor.sh",
-    "smoke": "npm --prefix server run smoke"
+    "smoke": "npm --prefix server run smoke",
+    "tunnel:pinggy": "bash scripts/tunnel-pinggy.sh",
+    "tunnel:tunnelmole": "bash scripts/tunnel-tunnelmole.sh"
   }
 }
