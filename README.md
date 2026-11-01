@@ -164,7 +164,7 @@ Useful commands: `npm run reset` (wipe the DB), `npm run seed -- --force` (re-se
 ### One-command quickstart from the repository root
 
 ```bash
-git clone https://github.com/<your-user>/peerplay.git
+git clone https://github.com/Gsurabm/peerplay.git
 cd peerplay
 npm run install:all     # installs server/ and web/ dependencies
 npm run seed            # demo players, match history, leaderboards, an admin account
@@ -485,6 +485,16 @@ output out of history, `.env.example` documents every setting, `LICENSE` is MIT,
 | `server/uploads/` | ❌ no | user-uploaded avatars |
 | `web/dist/`, `node_modules/`, `.tools/` | ❌ no | build output and tooling |
 
+### This repository
+
+**Live at → https://github.com/Gsurabm/peerplay** (public, branch `main`)
+
+Clone it with:
+
+```bash
+git clone https://github.com/Gsurabm/peerplay.git
+```
+
 ### Step 1 — create the repository on GitHub
 
 **Option A — the web UI (no GitHub CLI needed):**
@@ -544,7 +554,19 @@ git diff                   # review before committing
 git checkout -b feature/x  # work on a branch
 ```
 
-### Step 4 — deploy it from GitHub
+### Step 4 — add the CI workflow (needs the `workflow` scope)
+
+`ci.yml` lives in this repo but GitHub only accepts workflow files from a token that carries the
+**`workflow`** scope (classic tokens) or the **Workflows** write permission (fine-grained tokens).
+Two ways to add it:
+
+* Edit your classic token at <https://github.com/settings/tokens> → tick **`workflow`** → paste it
+  again and it can be pushed in one commit.
+* Or open <https://github.com/Gsurabm/peerplay/new/main/.github/workflows> → *Create new file* →
+  name it `ci.yml` → paste the contents of `.github/workflows/ci.yml` from this repository → commit.
+  The GitHub web editor is not subject to token scopes.
+
+### Step 5 — deploy it from GitHub
 
 * **GitHub Pages** cannot run this app (it needs a Node server + SQLite). Use it only for docs.
 * **Any Node host works** — a VPS (Ubuntu), Railway, Render, Fly.io, Koyeb or DigitalOcean
@@ -556,7 +578,7 @@ git checkout -b feature/x  # work on a branch
 * **The repo already includes CI** — every push to `main` builds the web client and runs the
   smoke test; the green check next to the commit tells you the code is sound.
 
-### Step 5 — keep secrets out of GitHub
+### Step 6 — keep secrets out of GitHub
 
 * `server/.env` is ignored. Copy `server/.env.example` → `server/.env` locally and fill it in.
 * In production, set `NODE_ENV=production` and replace `JWT_SECRET`, `DEVICE_SALT` and
