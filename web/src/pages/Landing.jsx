@@ -51,13 +51,14 @@ export default function Landing() {
   const [publicLinks, setPublicLinks] = useState([]);
   const [copied, setCopied] = useState('');
 
-  if (user) return <Navigate to="/app" replace />;
-
+  // Must stay ABOVE the early return below - hooks cannot be conditional.
   useEffect(() => {
     get('/config')
       .then((c) => setPublicLinks(c?.public_links || []))
       .catch(() => {});
   }, []);
+
+  if (user) return <Navigate to="/app" replace />;
 
   async function quickStart() {
     setBusy(true);
