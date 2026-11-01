@@ -492,6 +492,19 @@ git push -u origin main
 password) — create one at <https://github.com/settings/tokens> with the `repo` scope. If you
 prefer SSH: `git remote set-url origin git@github.com:<your-user>/peerplay.git`.
 
+**Working on your own machine instead?** Download `peerplay-v1.0.zip` (the clean source, no
+`node_modules`, no database), unzip it, and run the same three commands — or start from scratch:
+
+```bash
+unzip peerplay-v1.0.zip
+cd peerplay
+git init -b main
+git add -A
+git commit -m "PeerPlay v1.0"
+git remote add origin https://github.com/<your-user>/peerplay.git
+git push -u origin main
+```
+
 ### Step 3 — keep it updated
 
 ```bash
